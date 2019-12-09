@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Brellas\\source\\repos\\TimeSheets\\Timesheets\\Timesheets.csproj": {}
+    "C:\\Users\\chiot\\source\\repos\\CambondiaNet\\CambodiaCore\\Timesheets\\Timesheets.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Brellas\\source\\repos\\TimeSheets\\Timesheets\\Timesheets.csproj": {
+    "C:\\Users\\chiot\\source\\repos\\CambondiaNet\\CambodiaCore\\Timesheets\\Timesheets.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Brellas\\source\\repos\\TimeSheets\\Timesheets\\Timesheets.csproj",
+        "projectUniqueName": "C:\\Users\\chiot\\source\\repos\\CambondiaNet\\CambodiaCore\\Timesheets\\Timesheets.csproj",
         "projectName": "Timesheets",
-        "projectPath": "C:\\Users\\Brellas\\source\\repos\\TimeSheets\\Timesheets\\Timesheets.csproj",
-        "packagesPath": "C:\\Users\\Brellas\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Brellas\\source\\repos\\TimeSheets\\Timesheets\\obj\\",
+        "projectPath": "C:\\Users\\chiot\\source\\repos\\CambondiaNet\\CambodiaCore\\Timesheets\\Timesheets.csproj",
+        "packagesPath": "C:\\Users\\chiot\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\chiot\\source\\repos\\CambondiaNet\\CambodiaCore\\Timesheets\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Brellas\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\chiot\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

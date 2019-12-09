@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Timesheets.Data;
 
 namespace Timesheets.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191209122830_DBInitial")]
+    partial class DBInitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,22 +50,22 @@ namespace Timesheets.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4ff0d9a9-d946-425d-b9a4-f0b459dc2a04",
-                            ConcurrencyStamp = "6939ee2b-5ea1-41d1-bf98-ff7608f2fae2",
+                            Id = "82985b45-2d5a-443b-8d2d-f030a5ba60ae",
+                            ConcurrencyStamp = "29b9e030-051d-4ecf-8f4b-9b1c9ac06e87",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "506140a4-13ef-4d12-b02f-3f8ea493e9db",
-                            ConcurrencyStamp = "645eff8d-43a1-4ff0-a6b9-5cf4c52ce7ec",
+                            Id = "e4b0a429-4b0f-4fc0-aef6-d7ee14353d7d",
+                            ConcurrencyStamp = "3181a003-6a99-4608-a492-1606542337a9",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "ef9c25bd-f77f-4c02-b2bf-9bc192288399",
-                            ConcurrencyStamp = "f203dae8-7ce7-47c0-9374-aadf4853505d",
+                            Id = "dc5f8e87-dd1c-468f-a3eb-5eac34b590de",
+                            ConcurrencyStamp = "e9728da5-e334-4b09-af81-58baa9df89d1",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         });
@@ -197,18 +199,6 @@ namespace Timesheets.Migrations
                         .HasFilter("[DepartmentHeadId] IS NOT NULL");
 
                     b.ToTable("Departments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Department 1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Department 2"
-                        });
                 });
 
             modelBuilder.Entity("Timesheets.Models.DepartmentProject", b =>
@@ -328,18 +318,6 @@ namespace Timesheets.Migrations
                     b.HasIndex("OwnerDeptId");
 
                     b.ToTable("Projects");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Project1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Project 2"
-                        });
                 });
 
             modelBuilder.Entity("Timesheets.Models.TimesheetEntry", b =>
