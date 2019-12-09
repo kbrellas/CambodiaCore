@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,8 @@ namespace Timesheets.Controllers
         // GET: TimesheetEntries
         public async Task<IActionResult> Index()
         {
-            return View(await _context.TimesheetEntries.ToListAsync());
+            
+            return View(await _context.TimesheetEntries.Include( p => p.RelatedProject).Include(u=>u.RelatedUser).ToListAsync());
         }
 
         // GET: TimesheetEntries/Details/5
@@ -36,12 +38,15 @@ namespace Timesheets.Controllers
                 return NotFound();
             }
 
-            var timesheetEntry = await _context.TimesheetEntries
+            var timesheetEntry = await _context.TimesheetEntries.Include(p=>p.RelatedProject).Include(u=>u.RelatedUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
+           // var tims = await _context.TimesheetEntries.Include(p => p.RelatedProject).Include(u => u.RelatedUser).ToListAsync();
+          //  var actual = from tim in tims where tim.RelatedProject.Id == 1 select tim;
             if (timesheetEntry == null)
             {
                 return NotFound();
             }
+            
 
             return View(timesheetEntry);
         }
@@ -52,8 +57,10 @@ namespace Timesheets.Controllers
             var projects = new List<SelectListItem>();
             foreach (Project project in _context.Projects.ToList()) {
                 projects.Add(new SelectListItem() { Value = project.Id.ToString(), Text = project.Name });
+                
             }
             ViewBag.Message = projects;
+            
             return View();
         }
 
@@ -62,27 +69,41 @@ namespace Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Project,HoursWorked")] TimesheetEntryViewModel timesheetEntry)
+        public async Task<IActionResult> Create( TimesheetEntryViewModel timesheetEntry)
         {
             
-            var actualProject = _context.Projects.Find(timesheetEntry.RelatedProject+1);
+            var actualProject = _context.Projects.Find(timesheetEntry.RelatedProject);
+            MyUser user = await UserManager.GetUserAsync(HttpContext.User);
+            var allTimesheets=await _context.TimesheetEntries.Include(p => p.RelatedProject).Include(u => u.RelatedUser).ToListAsync();
             
-            if (ModelState.IsValid && actualProject!=null)
+
+
+            if (ModelState.IsValid && actualProject!=null && user!=null)
             {
-                MyUser user = await UserManager.GetUserAsync(HttpContext.User);
-                
-                Console.WriteLine(user);
-                Console.WriteLine(actualProject);
-                Console.WriteLine(timesheetEntry.HoursWorked);
-                TimesheetEntry actualTimesheetEntry = new TimesheetEntry() {
-                    RelatedProject = actualProject,
-                    RelatedUser = user,
-                    DateCreated = DateTime.Now,
-                    HoursWorked = timesheetEntry.HoursWorked
-                };
-                _context.Add(actualTimesheetEntry);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var possibleTimesheet = from tim in allTimesheets
+                                        where tim.RelatedProject.Id == actualProject.Id &&
+                                        tim.RelatedUser.Id == user.Id &&
+                                        tim.DateCreated.Date == timesheetEntry.DateCreated.Date
+                                        select tim;
+                if (possibleTimesheet.Count() == 0)
+                {
+
+                    TimesheetEntry actualTimesheetEntry = new TimesheetEntry()
+                    {
+                        RelatedProject = actualProject,
+                        RelatedUser = user,
+                        DateCreated = timesheetEntry.DateCreated,
+                        HoursWorked = timesheetEntry.HoursWorked
+                    };
+                    _context.Add(actualTimesheetEntry);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else {
+                    var ErrorMsg = "Timesheet for Project: " + actualProject.Name +
+                        " with Date: " + timesheetEntry.DateCreated.Date + " already exists";
+                    return View(nameof(Error),ErrorMsg); 
+                }
             }
             return View(timesheetEntry);
         }
@@ -100,7 +121,22 @@ namespace Timesheets.Controllers
             {
                 return NotFound();
             }
-            return View(timesheetEntry);
+            var projects = new List<SelectListItem>();
+            foreach (Project project in _context.Projects.ToList())
+            {
+                projects.Add(new SelectListItem() { Value = project.Id.ToString(), Text = project.Name });
+
+            }
+            ViewBag.Message = projects;
+            TimesheetEntryViewModel timesheetViewModel = new TimesheetEntryViewModel()
+            {
+                RelatedProject = timesheetEntry.RelatedProject.Id,
+                DateCreated = timesheetEntry.DateCreated,
+                HoursWorked=timesheetEntry.HoursWorked
+            };
+
+
+            return View(timesheetViewModel);
         }
 
         // POST: TimesheetEntries/Edit/5
@@ -108,23 +144,39 @@ namespace Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,DateCreated,HoursWorked")] TimesheetEntry timesheetEntry)
+        public async Task<IActionResult> Edit(int id,  TimesheetEntryViewModel timesheetEntry)
         {
-            if (id != timesheetEntry.Id)
-            {
-                return NotFound();
-            }
+            var actualProject = _context.Projects.Find(timesheetEntry.RelatedProject);
+            var allTimesheets = await _context.TimesheetEntries.Include(p => p.RelatedProject).Include(u => u.RelatedUser).ToListAsync();
+
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(timesheetEntry);
-                    await _context.SaveChangesAsync();
+                    TimesheetEntry actualTimesheet = _context.TimesheetEntries.Find(id);
+                    var possibleTimesheet = from tim in allTimesheets
+                                            where tim.RelatedProject.Id == actualProject.Id &&
+                                            tim.RelatedUser.Id == actualTimesheet.RelatedUser.Id &&
+                                            tim.DateCreated.Date == timesheetEntry.DateCreated.Date
+                                            select tim;
+                    if (possibleTimesheet.Count() == 0)
+                    {
+                        actualTimesheet.RelatedProject = actualProject;
+                        actualTimesheet.HoursWorked = timesheetEntry.HoursWorked;
+                        actualTimesheet.DateCreated = timesheetEntry.DateCreated;
+                        _context.Update(actualTimesheet);
+                        await _context.SaveChangesAsync();
+                    }
+                    else {
+                        var ErrorMsg = "Timesheet for Project: " + actualProject.Name +
+                        " with Date: " + timesheetEntry.DateCreated.Date + " already exists";
+                        return View(nameof(Error), ErrorMsg);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TimesheetEntryExists(timesheetEntry.Id))
+                    if (!TimesheetEntryExists(id))
                     {
                         return NotFound();
                     }
@@ -146,7 +198,7 @@ namespace Timesheets.Controllers
                 return NotFound();
             }
 
-            var timesheetEntry = await _context.TimesheetEntries
+            var timesheetEntry = await _context.TimesheetEntries.Include(p=>p.RelatedProject).Include(u=>u.RelatedUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (timesheetEntry == null)
             {
@@ -170,6 +222,10 @@ namespace Timesheets.Controllers
         private bool TimesheetEntryExists(int id)
         {
             return _context.TimesheetEntries.Any(e => e.Id == id);
+        }
+
+        public  IActionResult Error(string ErrorMsg) {
+            return View(ErrorMsg);
         }
     }
 }

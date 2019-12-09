@@ -17,7 +17,10 @@ namespace Timesheets.Data
                 {
                     UserName = "admin@test.com",
                     Email = "admin@test.com",
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    CostPerHour = 2,
+                    FirstName="admin",
+                    LastName="Admin"
                 };
 
                 IdentityResult result = userManager.CreateAsync(user, "123456").Result;
