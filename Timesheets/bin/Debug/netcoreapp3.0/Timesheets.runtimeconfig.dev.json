@@ -1,8 +1,0 @@
-{
-  "runtimeOptions": {
-    "additionalProbingPaths": [
-      "C:\\Users\\chiot\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\chiot\\.nuget\\packages"
-    ]
-  }
-}
