@@ -2,27 +2,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Timesheets.Data;
 using Timesheets.Models;
+
 
 namespace Timesheets.Controllers
 {
     public class DepartmentsController : Controller
     {
+
+
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<MyUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public DepartmentsController(ApplicationDbContext context)
+        public DepartmentsController(ApplicationDbContext context, UserManager<MyUser> userManager,RoleManager<IdentityRole> roleManager)
         {
+            _roleManager = roleManager;
+            _userManager = userManager;
             _context = context;
         }
 
         // GET: Departments
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Departments.Include(d => d.DepartmentHead);
+            var applicationDbContext = _context.Departments
+                .Include(d => d.DepartmentHead)
+                .Include(d => d.Projects)
+                .Include(d => d.RelatedUsers);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -33,40 +46,67 @@ namespace Timesheets.Controllers
             {
                 return NotFound();
             }
-
+            
             var department = await _context.Departments
-                .Include(d => d.DepartmentHead)
+                .Include(d => d.DepartmentHead).Include(d=>d.Projects).Include(d => d.RelatedUsers)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (department == null)
             {
                 return NotFound();
             }
+            var projects = await _context.Projects.Where(p =>p.OwnerDept == department).ToListAsync();
 
-            return View(department);
+            DepartmentDetail departmentDetail = new DepartmentDetail();
+            departmentDetail.department = department;
+            departmentDetail.projects = projects;
+
+            return View(departmentDetail);
         }
 
         // GET: Departments/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["DepartmentHeadId"] = new SelectList(_context.Users, "Id", "Id");
+           // ViewData["DepartmentHeadId"] = new SelectList(_context.Users, "Id", "Id");
+            var managers = await _userManager.GetUsersInRoleAsync("Manager");
+
+            var managersList = new List<SelectListItem>();
+            foreach (MyUser u in managers.ToList())
+            {
+                managersList.Add(new SelectListItem() { Value = u.Id, Text = u.FirstName.ToString() + " " + u.LastName.ToString() });
+            }
+            ViewBag.managers = managersList;
             return View();
         }
 
         // POST: Departments/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,DepartmentHeadId")] Department department)
         {
+
             if (ModelState.IsValid)
             {
                 _context.Add(department);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException e) {
+                ViewBag.message = "Department Head already assigned to a Department";
+                    ViewBag.title = "Error Creating Department";
+                    ViewBag.alertClass = "alert alert-danger";
+                    return View("~/Views/Departments/Alerts.cshtml"); }
                 return RedirectToAction(nameof(Index));
             }
+
+
             ViewData["DepartmentHeadId"] = new SelectList(_context.Users, "Id", "Id", department.DepartmentHeadId);
             return View(department);
+
+
         }
 
         // GET: Departments/Edit/5
@@ -82,7 +122,15 @@ namespace Timesheets.Controllers
             {
                 return NotFound();
             }
-            ViewData["DepartmentHeadId"] = new SelectList(_context.Users, "Id", "Id", department.DepartmentHeadId);
+            var managers = await _userManager.GetUsersInRoleAsync("Manager");
+      
+            var managersList = new List<SelectListItem>();
+            foreach (MyUser u in managers.ToList())
+            {
+                managersList.Add(new SelectListItem() { Value = u.Id, Text = u.FirstName.ToString() + " " + u.LastName.ToString() });
+            }
+            ViewBag.managers=managersList;
+      
             return View(department);
         }
 
@@ -105,7 +153,7 @@ namespace Timesheets.Controllers
                     _context.Update(department);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException) 
                 {
                     if (!DepartmentExists(department.Id))
                     {
@@ -116,9 +164,26 @@ namespace Timesheets.Controllers
                         throw;
                     }
                 }
+                    catch (DbUpdateException)
+                    {
+                    department.DepartmentHead =await _userManager.FindByIdAsync(department.DepartmentHeadId);
+                    ViewBag.error = true;
+                    ViewBag.message = department.DepartmentHead.FirstName+" "+department.DepartmentHead.LastName+" already assigned to a Department";
+                    ViewBag.title = "Error Editing Department";
+                    ViewBag.alertClass = "alert alert-danger";
+                    var managers = await _userManager.GetUsersInRoleAsync("Manager");
+                    var managersList = new List<SelectListItem>();
+                    foreach (MyUser u in managers.ToList())
+                    {
+                        managersList.Add(new SelectListItem() { Value = u.Id, Text = u.FirstName.ToString() + " " + u.LastName.ToString() });
+                    }
+                    ViewBag.managers = managersList;
+                    return View();
+                    }
                 return RedirectToAction(nameof(Index));
+
             }
-            ViewData["DepartmentHeadId"] = new SelectList(_context.Users, "Id", "Id", department.DepartmentHeadId);
+         
             return View(department);
         }
 
@@ -137,6 +202,9 @@ namespace Timesheets.Controllers
             {
                 return NotFound();
             }
+          
+       
+            
 
             return View(department);
         }
@@ -146,15 +214,54 @@ namespace Timesheets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var department = await _context.Departments.FindAsync(id);
+          // var department = await _context.Departments.FindAsync(id);
+           var department = await _context.Departments.Include(d => d.Projects).Include(d => d.RelatedUsers).FirstOrDefaultAsync(d=> d.Id==id);
+            if (department.Projects.Count > 0)
+            {
+                ViewBag.title = "Error Deleting Department";
+                ViewBag.alertClass = "alert alert-danger";
+                ViewBag.message = "You cannot delete this Department because it Owns Projects";
+                ViewBag.back= "index";
+                return View("~/Views/Departments/Alerts.cshtml");
+            }
+            if (department.RelatedUsers.Count > 0)
+            {
+                ViewBag.title = "Error Deleting Department";
+                ViewBag.alertClass = "alert alert-danger";
+                ViewBag.message = "You cannot delete this Department because it has related employees";
+                ViewBag.back = "index";
+                return View("~/Views/Departments/Alerts.cshtml");
+            }
+
+
+
             _context.Departments.Remove(department);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            ViewBag.title = "Department Deleted";
+            ViewBag.alertClass = "alert alert-success";
+            ViewBag.message = "Department was deleted succsfully";
+            ViewBag.back = "index";
+            return View("~/Views/Departments/Alerts.cshtml");
+          //  return RedirectToAction(nameof(Index));
         }
 
         private bool DepartmentExists(int id)
         {
             return _context.Departments.Any(e => e.Id == id);
         }
+
+    
+     
     }
+
+
+   
+
+
+
+
+
+
+
+
 }
