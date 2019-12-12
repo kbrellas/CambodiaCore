@@ -8,8 +8,12 @@ namespace Timesheets.Models
 {
     public class TimesheetEntryViewModel
     {
-        [Display(Name ="Related Project")]
+        [Display(Name = "Related Project")]
         public int RelatedProject { get; set; }
+
+        [Display(Name = "Date")]
+        
+        public DateTime DateCreated { get; set; }
 
         [Display(Name ="Hours Worked")]
         public int HoursWorked { get; set; }

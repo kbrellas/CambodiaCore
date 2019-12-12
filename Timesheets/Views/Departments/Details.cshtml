@@ -1,4 +1,4 @@
-﻿@model Timesheets.Models.Department
+﻿@model Timesheets.Models.DepartmentDetail
 
 @{
     ViewData["Title"] = "Details";
@@ -10,21 +10,38 @@
     <h4>Department</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.department.Name)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.department.Name)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DepartmentHead)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.department.DepartmentHead)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DepartmentHead.Id)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.department.DepartmentHead.FirstName) @Html.DisplayFor(model => model.department.DepartmentHead.FirstName)
         </dd>
+        <dt class="col-sm-2">
+            Owned Projects
+        </dt>
+        <dd class="col-sm-10">
+            @Model.projects.Count
+        </dd>
+
+
+        @for (var i = 0; i < Model.projects.Count; i++)
+        {   <dt class="col-sm-2">
+                project @(i+1) 
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.projects[i].Name)
+            </dd>
+           
+        }
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.department.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
