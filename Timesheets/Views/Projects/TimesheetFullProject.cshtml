@@ -1,0 +1,27 @@
+﻿@model Timesheets.Models.Project
+
+@{
+    ViewData["Title"] = "TimesheetFullProject";
+}
+
+<h1>Unable to delete</h1>
+
+<h3>There are Timesheets Related to this Project.</h3>
+<div>
+    <h4>Project</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+    </dl>
+
+    <form>
+        <input type="hidden" asp-for="Id" />
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
+
