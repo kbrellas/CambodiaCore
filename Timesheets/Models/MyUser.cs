@@ -13,8 +13,14 @@ namespace Timesheets.Models
         public string FirstName { get; set; }
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
+        
+
         [Display(Name = "Department")]
         public Department Department { get; set; }
+
+        public Department ManagedDepartment { get; set; }
+
         [Display(Name = "Cost per Hour")]
         public double CostPerHour { get; set; }
         [Display(Name = "Manager")]

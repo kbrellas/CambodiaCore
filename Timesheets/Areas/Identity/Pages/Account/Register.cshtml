@@ -39,6 +39,11 @@
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Input.CostPerHour"></label>
+                <input asp-for="Input.CostPerHour" type="number" class="form-control" />
+                <span asp-validation-for="Input.CostPerHour" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="Input.SelectedRoles"></label>
                 <select asp-for="Input.SelectedRoles" asp-items="Model.Roles">
                 </select>

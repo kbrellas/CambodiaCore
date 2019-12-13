@@ -6,36 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.cs" />
-    <Compile Remove="Data\Migrations\00000000000000_CreateIdentitySchema.Designer.cs" />
-    <Compile Remove="Migrations\20191208090019_InitialDB.cs" />
-    <Compile Remove="Migrations\20191208090019_InitialDB.Designer.cs" />
-    <Compile Remove="Migrations\20191208090758_RelatedUserDepartments.cs" />
-    <Compile Remove="Migrations\20191208090758_RelatedUserDepartments.Designer.cs" />
-    <Compile Remove="Migrations\20191208102334_InitialDBCreate.cs" />
-    <Compile Remove="Migrations\20191208102334_InitialDBCreate.Designer.cs" />
-    <Compile Remove="Migrations\20191209122830_DBInitial.cs" />
-    <Compile Remove="Migrations\20191209122830_DBInitial.Designer.cs" />
-    <Compile Remove="Migrations\20191209125502_DBInitial2.cs" />
-    <Compile Remove="Migrations\20191209125502_DBInitial2.Designer.cs" />
-    <Compile Remove="Migrations\20191210205608_kostakis.cs" />
-    <Compile Remove="Migrations\20191210205608_kostakis.Designer.cs" />
-    <Compile Remove="Migrations\20191212170535_GoToTheDataBase.cs" />
-    <Compile Remove="Migrations\20191212170535_GoToTheDataBase.Designer.cs" />
-    <Compile Remove="Migrations\20191212180930_ConstractDatabase.cs" />
-    <Compile Remove="Migrations\20191212180930_ConstractDatabase.Designer.cs" />
-    <Compile Remove="Migrations\20191212191419_InitiateDataBase.cs" />
-    <Compile Remove="Migrations\20191212191419_InitiateDataBase.Designer.cs" />
-    <Compile Remove="Migrations\20191212203557_ThatWillFixTheEdit.cs" />
-    <Compile Remove="Migrations\20191212203557_ThatWillFixTheEdit.Designer.cs" />
-    <Compile Remove="Migrations\20191213085426_InitializeDataBase.cs" />
-    <Compile Remove="Migrations\20191213085426_InitializeDataBase.Designer.cs" />
-    <Compile Remove="Migrations\20191213113153_FanalMigrationForProjectEntity.cs" />
-    <Compile Remove="Migrations\20191213113153_FanalMigrationForProjectEntity.Designer.cs" />
-    <Compile Remove="Migrations\20191213134414_InitialDB.cs" />
-    <Compile Remove="Migrations\20191213134414_InitialDB.Designer.cs" />
-    <Compile Remove="Migrations\20191213173223_initialDB.cs" />
-    <Compile Remove="Migrations\20191213173223_initialDB.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191213112755_initial43.cs" />
+    <Compile Remove="Data\Migrations\20191213112755_initial43.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191213113141_initial47.cs" />
+    <Compile Remove="Data\Migrations\20191213113141_initial47.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191213113335_initial49.cs" />
+    <Compile Remove="Data\Migrations\20191213113335_initial49.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191213113404_initial41.cs" />
+    <Compile Remove="Data\Migrations\20191213113404_initial41.Designer.cs" />
+    <Compile Remove="Data\Migrations\20191213113614_initial411.cs" />
+    <Compile Remove="Data\Migrations\20191213113614_initial411.Designer.cs" />
   </ItemGroup>
 
 
@@ -47,13 +27,11 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
-    <PackageReference Include="xunit.extensibility.core" Version="2.4.1" />
   </ItemGroup>
 
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>
