@@ -10,8 +10,8 @@ using Timesheets.Data;
 namespace Timesheets.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191212175008_Initial5")]
-    partial class Initial5
+    [Migration("20191213113928_initial1")]
+    partial class initial1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,22 +50,22 @@ namespace Timesheets.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "610dc917-8264-4621-9565-a9d4d3883561",
-                            ConcurrencyStamp = "ae066327-ba83-4712-af4c-b6734c09b19a",
+                            Id = "34b87de3-a0c3-41c9-9343-2de42c911177",
+                            ConcurrencyStamp = "05637768-5a38-46dc-bd73-d0e9ff677a81",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "2d866d15-1866-42d5-b53b-ffebe179d37e",
-                            ConcurrencyStamp = "2ecbc32e-eaa7-4417-84b3-e7c8a0354bf4",
+                            Id = "2af28c60-4b59-4617-abe1-371d6e226e60",
+                            ConcurrencyStamp = "4886fcc1-45a5-49ea-9a4c-b18dfdf14b20",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "b1ee9756-620b-4aef-a9a9-22f233984f74",
-                            ConcurrencyStamp = "3b37c302-0405-47ed-a422-25c5242961af",
+                            Id = "2f95c361-c601-439e-8df3-5cc027a4f6f4",
+                            ConcurrencyStamp = "d11fd6b8-973a-4013-8886-43e4f6481edc",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         });

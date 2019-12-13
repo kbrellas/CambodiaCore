@@ -69,18 +69,18 @@ namespace Timesheets.Areas.Identity.Pages.Account
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            [Required(ErrorMessage ="You must enter a first name")]
-            [Display(Name ="First Name")]
+            [Required(ErrorMessage = "You must enter a first name")]
+            [Display(Name = "First Name")]
             public string FirstName { get; set; }
             [Required(ErrorMessage = "You must enter a last name")]
             [Display(Name = "Last Name")]
             public string LastName { get; set; }
 
-            [Required(ErrorMessage ="You must select at least one role")]
-            [Display(Name ="Roles")]
+            [Required(ErrorMessage = "You must select at least one role")]
+            [Display(Name = "Roles")]
             public IList<string> SelectedRoles { get; set; }
-            
-            [Required(ErrorMessage ="You must select a department")]
+
+            [Required(ErrorMessage = "You must select a department")]
             [Display(Name = "Department")]
             public int SelectedDepartment { get; set; }
 
@@ -88,6 +88,10 @@ namespace Timesheets.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required(ErrorMessage = "Please enter cost per hour")]
+            [Display(Name ="Cost per Hour")]
+            public int CostPerHour { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -113,11 +117,13 @@ namespace Timesheets.Areas.Identity.Pages.Account
             {
                 Department selDept = _context.Departments.First(x => x.Id == Input.SelectedDepartment);
 
-                var user = new MyUser { UserName = Input.Email, 
-                    Email = Input.Email, 
-                    FirstName=Input.FirstName, 
-                    LastName=Input.LastName, 
-                    // Department = selDept
+                var user = new MyUser { UserName = Input.Email,
+                    Email = Input.Email,
+                    FirstName = Input.FirstName,
+                    LastName = Input.LastName,
+                    Department = selDept,
+                    CostPerHour = Input.CostPerHour,
+                    Manager = _context.Users.FirstOrDefault(u => u.Id == selDept.DepartmentHeadId)
                 };
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -128,11 +134,13 @@ namespace Timesheets.Areas.Identity.Pages.Account
                     await _userManager.AddToRolesAsync(user, Input.SelectedRoles);
 
                     // TODO: This must be implemented correctly - THIS CODE SHOULD NOT EXIST
-                    if (selDept.RelatedUsers == null)
-                        selDept.RelatedUsers = new List<MyUser>();
+                    //if (selDept.RelatedUsers == null)
+                    //    selDept.RelatedUsers = new List<MyUser>();
 
-                    selDept.RelatedUsers.Add(user);
-                    _context.SaveChanges();
+                    //selDept.RelatedUsers.Add(user);
+                    //_context.Update(selDept);
+                    //_context.SaveChanges();
+                   
                     // END TODO
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

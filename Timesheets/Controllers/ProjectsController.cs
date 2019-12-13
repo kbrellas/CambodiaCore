@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
+
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -133,7 +133,7 @@ namespace Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,OwnerDept,Departments")] ProjectEditModelView project)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,OwnerDept,Departments")] ProjectViewModel project)
         {
             var actualOwnerDept = _context.Departments.Find(project.OwnerDept);
             ICollection<Department> actualDepartments = new List<Department>();
@@ -174,7 +174,7 @@ namespace Timesheets.Controllers
                     _context.Update(actualProject);
                     await _context.SaveChangesAsync();
                 }
-                catch (System.Data.Entity.Infrastructure.DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException)
                 {
                     if (!ProjectExists(actualProject.Id))
                     {

@@ -35,9 +35,12 @@ namespace Timesheets.Controllers
             //var usrs = UserManager.Users.ToList();
             //var useer = _context.Users.ToList();
             MyUser user = await UserManager.GetUserAsync(HttpContext.User);
-           // var alluser = await UserManager.GetUsers
-            var allTimesheets = await _context.TimesheetEntries.Include(p => p.RelatedProject).Include(u => u.RelatedUser).ToListAsync();
-
+            
+            MyUser betterUser =  _context.Users.Include(d=>d.Department).FirstOrDefault(u=>u.Id==user.Id);
+            _context.Entry(betterUser).Reference("Department").Load();
+            // var alluser = await UserManager.GetUsers
+            var allTimesheets = await _context.TimesheetEntries.Include(p => p.RelatedProject).Include(u => u.RelatedUser).Include(d=>d.RelatedUser.Department).ToListAsync();
+           
             if (User.IsInRole("Admin"))
             {       
 
@@ -46,7 +49,8 @@ namespace Timesheets.Controllers
             else if (User.IsInRole("Manager"))
             {
                  var certainTimesheets = from timesheet in allTimesheets
-                                        where timesheet.RelatedUser.Department.Id == user.Department.Id
+                                        where timesheet.RelatedUser.Department!=null &&
+                                        timesheet.RelatedUser.Department.Id == user.Department.Id
                                         select timesheet;
                 return View(certainTimesheets);
             }

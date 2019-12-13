@@ -10,8 +10,8 @@ using Timesheets.Data;
 namespace Timesheets.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191208102334_InitialDBCreate")]
-    partial class InitialDBCreate
+    [Migration("20191213170903_INitial23")]
+    partial class INitial23
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,22 +50,22 @@ namespace Timesheets.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a6b30f17-e1a5-4401-aa86-75b648390684",
-                            ConcurrencyStamp = "22e1e1ef-4587-4477-a7e8-dffe11b860fb",
+                            Id = "8396aba6-58dd-4da9-b628-6aaea0563eb3",
+                            ConcurrencyStamp = "5374ee95-8080-41b3-8bc8-c5ba83a33e3f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "136d38fb-0fcd-4426-9939-183819c0aa5b",
-                            ConcurrencyStamp = "36fe4016-cee6-4da2-a0d1-ccbcdc879087",
+                            Id = "3e9566b1-5572-4939-a18f-97c54e618421",
+                            ConcurrencyStamp = "3fa16eb3-84d4-4eeb-86c5-99f5edf1a6a6",
                             Name = "Employee",
                             NormalizedName = "EMPLOYEE"
                         },
                         new
                         {
-                            Id = "6e7ae09f-60ae-4552-8705-3b63a1fa5bda",
-                            ConcurrencyStamp = "2496a158-139b-45e5-8018-bfa674b55ceb",
+                            Id = "bd988b0c-97f1-4f14-8421-103dee1ed377",
+                            ConcurrencyStamp = "0d4cef6e-32a4-4a6f-bddb-ef5d985b8820",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         });
@@ -199,6 +199,18 @@ namespace Timesheets.Migrations
                         .HasFilter("[DepartmentHeadId] IS NOT NULL");
 
                     b.ToTable("Departments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Department 1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Department 2"
+                        });
                 });
 
             modelBuilder.Entity("Timesheets.Models.DepartmentProject", b =>
@@ -318,6 +330,18 @@ namespace Timesheets.Migrations
                     b.HasIndex("OwnerDeptId");
 
                     b.ToTable("Projects");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Project1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Project 2"
+                        });
                 });
 
             modelBuilder.Entity("Timesheets.Models.TimesheetEntry", b =>
@@ -402,7 +426,7 @@ namespace Timesheets.Migrations
             modelBuilder.Entity("Timesheets.Models.Department", b =>
                 {
                     b.HasOne("Timesheets.Models.MyUser", "DepartmentHead")
-                        .WithOne("Department")
+                        .WithOne("ManagedDepartment")
                         .HasForeignKey("Timesheets.Models.Department", "DepartmentHeadId");
                 });
 
@@ -423,9 +447,10 @@ namespace Timesheets.Migrations
 
             modelBuilder.Entity("Timesheets.Models.MyUser", b =>
                 {
-                    b.HasOne("Timesheets.Models.Department", null)
+                    b.HasOne("Timesheets.Models.Department", "Department")
                         .WithMany("RelatedUsers")
-                        .HasForeignKey("DepartmentId");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Timesheets.Models.MyUser", "Manager")
                         .WithMany()

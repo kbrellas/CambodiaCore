@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Timesheets.Data;
 using Timesheets.Models;
 
@@ -23,60 +26,108 @@ namespace Timesheets.Controllers
         // GET: Users
         public async Task<ActionResult> Index()
         {
-            return View(_context.Users.ToList());
+            var users = _context.Users.Include(d=>d.Department).ToList();
+            return  View(users);
         }
 
         // GET: Users/Details/5
-        public async Task<ActionResult> Details(String? id)
+        public async Task<ActionResult> Details(string id)
         {
             if (id == null)
                 return NotFound();
-
-            var user = await _context.Users.FindAsync(id);
+            
+            var user =  _context.Users.Include(u=>u.Manager).Include(d=>d.Department).FirstOrDefault(u=>u.Id==id);
+            var us =await UserManager.GetRolesAsync(user);
 
             if (user == null)
                 return NotFound();
-
+            ViewBag.Roles = us;
             return View(user);
         }
 
         // GET: Users/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Users/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+       
 
         // GET: Users/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
+        public async Task<ActionResult> Edit(String id)
+        { 
+        if (id == null)
+            {
+                return NotFound();
+            }
+            var user = _context.Users.Include(d => d.Department).FirstOrDefault(i => i.Id == id);
+            var roles =  UserManager.GetRolesAsync(user).Result;
+            
+        
+            var roleList = new List<SelectListItem>();
+            foreach(var role in roles)
+            {
+                roleList.Add(new SelectListItem() { Value = role, Text = role });
+            }
+            var depts = _context.Departments.ToList();
+            var departments = new List<SelectListItem>();
+            foreach (Department dept in depts)
+            {
+                departments.Add(new SelectListItem() { Value = dept.Id.ToString(), Text = dept.Name });
+            }
+            var allRoles = _context.Roles.ToList();
+            var allRolesList = new List<SelectListItem>();
+            foreach(var role in allRoles)
+            {
+                allRolesList.Add(new SelectListItem() { Value=role.Name , Text=role.Name});
+            }
+            ViewBag.AllRoles = allRolesList;
+            ViewBag.Depts = departments;
+            ViewBag.SelectedRoles=roleList;
+            MyUserViewModel userViewModel;
+            if (user.Department != null)
+            {
+                 userViewModel = new MyUserViewModel()
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    CostPerHour = user.CostPerHour,
+                    Role = roles,
+                    DepartmentId = user.Department.Id
+
+                };
+            }
+            else {
+                 userViewModel = new MyUserViewModel()
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    CostPerHour = user.CostPerHour,
+                    Role = roles
+                   
+
+                };
+            }
+      
+            return View(userViewModel);
         }
 
         // POST: Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(string id, MyUserViewModel userViewModel)
         {
+            var actualUser= _context.Users.Include(d => d.Department).FirstOrDefault(i => i.Id == id);
+            var allRolelist = new List<string>() { "Manager", "Employee", "Admin" };
+            await UserManager.RemoveFromRolesAsync(actualUser,allRolelist);
             try
             {
-                // TODO: Add update logic here
+                actualUser.FirstName = userViewModel.FirstName;
+                actualUser.LastName = userViewModel.LastName;
+                actualUser.Email = userViewModel.Email;
+                actualUser.CostPerHour = userViewModel.CostPerHour;
+                actualUser.Department =await _context.Departments.FindAsync(userViewModel.DepartmentId);
+                actualUser.Manager =await _context.Users.FindAsync(actualUser.Department.DepartmentHeadId);
+                await UserManager.AddToRolesAsync(actualUser, userViewModel.Role);
+                await UserManager.UpdateAsync(actualUser);
+                
 
                 return RedirectToAction(nameof(Index));
             }
@@ -87,26 +138,75 @@ namespace Timesheets.Controllers
         }
 
         // GET: Users/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(string id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _context.Users
+                .Include(d => d.Department).Include(m=>m.Manager)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var roles =await  UserManager.GetRolesAsync(user);
+            ViewBag.Roles = roles;
+
+
+            return View(user);
         }
 
         // POST: Users/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> DeleteConfirmed(string id)
         {
             try
             {
-                // TODO: Add delete logic here
+                MyUser user =  _context.Users.Include(d=>d.Department).FirstOrDefault(d=>d.Id==id);
+                var roles =await UserManager.GetRolesAsync(user);
+                if (roles != null)
+                {
+                    if (roles.Contains("Admin"))
+                    {
+                        return View(nameof(Error), "Cannot delete Admin");
+                    }
+                }
+                if (user.Department != null)
+                {
+                    var dept = _context.Departments.Find(user.Department.Id);
+                    dept.RelatedUsers.Remove(user);
 
-                return RedirectToAction(nameof(Index));
+                    _context.SaveChanges();
+                }
+                var allTimesheets = _context.TimesheetEntries.Include(r=>r.RelatedUser).ToList();
+                foreach(TimesheetEntry tim in allTimesheets)
+                {
+                    if (tim.RelatedUser.Id == id) {
+                        _context.TimesheetEntries.Remove(tim);
+                    }
+                }
+                var result=await UserManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else {
+                    return View(nameof(Error), "Could not delete user");
+                }
             }
-            catch
+            catch(Exception e)
             {
-                return View();
+                Debug.WriteLine(e.StackTrace.ToString());
+                return View(nameof(Error),"Could not delete");
             }
+        }
+
+        public  ActionResult Error(string msg) {
+            return View(msg);
         }
     }
 }

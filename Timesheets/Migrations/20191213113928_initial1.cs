@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Timesheets.Migrations
 {
-    public partial class InitialDBCreate : Migration
+    public partial class initial1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -234,17 +234,30 @@ namespace Timesheets.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "a6b30f17-e1a5-4401-aa86-75b648390684", "22e1e1ef-4587-4477-a7e8-dffe11b860fb", "Admin", "ADMIN" });
+                values: new object[,]
+                {
+                    { "34b87de3-a0c3-41c9-9343-2de42c911177", "05637768-5a38-46dc-bd73-d0e9ff677a81", "Admin", "ADMIN" },
+                    { "2af28c60-4b59-4617-abe1-371d6e226e60", "4886fcc1-45a5-49ea-9a4c-b18dfdf14b20", "Employee", "EMPLOYEE" },
+                    { "2f95c361-c601-439e-8df3-5cc027a4f6f4", "d11fd6b8-973a-4013-8886-43e4f6481edc", "Manager", "MANAGER" }
+                });
 
             migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "136d38fb-0fcd-4426-9939-183819c0aa5b", "36fe4016-cee6-4da2-a0d1-ccbcdc879087", "Employee", "EMPLOYEE" });
+                table: "Departments",
+                columns: new[] { "Id", "DepartmentHeadId", "Name" },
+                values: new object[,]
+                {
+                    { 1, null, "Department 1" },
+                    { 2, null, "Department 2" }
+                });
 
             migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "6e7ae09f-60ae-4552-8705-3b63a1fa5bda", "2496a158-139b-45e5-8018-bfa674b55ceb", "Manager", "MANAGER" });
+                table: "Projects",
+                columns: new[] { "Id", "Name", "OwnerDeptId" },
+                values: new object[,]
+                {
+                    { 1, "Project1", null },
+                    { 2, "Project 2", null }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
