@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -35,14 +33,39 @@ namespace Timesheets.Controllers
             {
                 return NotFound();
             }
+            var project = await _context.Projects.
+                Include(c => c.Departments).FirstOrDefaultAsync(d => d.Id == id);
+            List<string> depnames = new List<string>();
 
-            var project = await _context.Projects
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (project == null)
+            if (project.Departments == null || project.Departments.Count==0)
             {
-                return NotFound();
+                depnames.Add("No Contributing Departments");
             }
-
+            else
+            {
+                var actualDepartments = new List<Department>();
+                foreach (DepartmentProject dep in project.Departments)
+                {
+                    actualDepartments.Add(await _context.Departments.FindAsync(dep.DepartmentId));
+                }
+                foreach(Department dep in actualDepartments)
+                {
+                    if (dep.Name == null)
+                        depnames.Add("Department with no Name and ID: " + dep.Id);
+                    else
+                        depnames.Add(dep.Name);
+                }
+            }
+            if(project.OwnerDept == null || project.OwnerDept.Name == null)
+            {
+                ViewBag.HeadDepartment = "Not yet set";
+            }
+            else
+            {
+                ViewBag.HeadDepartment = project.OwnerDept.Name;
+            }
+            
+            ViewBag.ContributingDepartments = depnames;
             return View(project);
         }
 
@@ -83,9 +106,7 @@ namespace Timesheets.Controllers
                 var departmentProject = new DepartmentProject() 
                 { 
                     Department = department, 
-                    //DepartmentId = department.Id, 
                     Project = actualProject, 
-                    //ProjectId = actualProject.Id 
                 };
                 actualProject.Departments.Add(departmentProject);
 
@@ -93,8 +114,7 @@ namespace Timesheets.Controllers
 
             if (ModelState.IsValid)
             {
-                //MyUser user = await UserManager.GetUserAsync(HttpContext.User);
-
+             
                 Console.WriteLine(project.Name);
                 Console.WriteLine(actualOwnerDept);
                 Console.WriteLine(actualDepartments);
@@ -120,10 +140,29 @@ namespace Timesheets.Controllers
                 return NotFound();
             }
             var departments = new List<SelectListItem>();
-            foreach (Department department in _context.Departments.ToList())
+            foreach (Department department in (await _context.Departments.ToListAsync()))
             {
                 departments.Add(new SelectListItem() { Value = department.Id.ToString(), Text = department.Name });
             }
+            if(project.OwnerDept == null)
+            {
+                ViewBag.InitialDepartmentValue = 0;
+                ViewBag.InitialDepartmentName = departments.ElementAt(0).Text;
+            }
+            else
+            {
+                foreach (SelectListItem selectListItem in departments)
+                {
+                    if (selectListItem.Text.Equals(project.OwnerDept.Name))
+                    {
+                        ViewBag.InitialDepartmentValue = selectListItem.Value;
+                        ViewBag.InitialDepartmentName = selectListItem.Text;
+                    }
+                        
+                }
+            }
+            
+                       
             ViewBag.Message = departments;
             return View(project);
         }
@@ -133,32 +172,12 @@ namespace Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,OwnerDept,Departments")] ProjectEditModelView project)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,OwnerDept,Departments")] ProjectViewModel project)
         {
-            var actualOwnerDept = _context.Departments.Find(project.OwnerDept);
-            ICollection<Department> actualDepartments = new List<Department>();
-            ICollection<DepartmentProject> departmentProjects = new List<DepartmentProject>();
-            foreach (int i in project.Departments)
-            {
-                actualDepartments.Add(_context.Departments.Find(i));
-            }
-            Project actualProject = new Project()
-            {
-                Id = id,
-                Name = project.Name,
-                OwnerDept = actualOwnerDept,
-                Departments = departmentProjects
-            };
-            foreach (Department department in actualDepartments)
-            {
-                var departmentProject = new DepartmentProject()
-                {
-                    Department = department,
-                    Project = actualProject, 
-                };
-                actualProject.Departments.Add(departmentProject);
 
-            }
+
+            var actualProject = await _context.Projects.Include(c => c.Departments).FirstOrDefaultAsync(d => d.Id == id);
+
             if (id != actualProject.Id)
             {
                 return NotFound();
@@ -166,15 +185,54 @@ namespace Timesheets.Controllers
 
             if (ModelState.IsValid)
             {
+                
+
+
+                if (project.Name == null)
+                {
+                    actualProject.Name = project.Name;
+                    _context.Update(actualProject);
+                }
+
+                var actualOwnerDept = await _context.Departments.FindAsync(project.OwnerDept);
+                if (actualOwnerDept != null)
+                {
+                    actualProject.OwnerDept = actualOwnerDept;
+                    _context.Update(actualProject);
+                }
+
+                if (project.Departments != null)
+                {
+                    ICollection<DepartmentProject> fetchedDepartmentProjects = actualProject.Departments;
+                    foreach (DepartmentProject dp in fetchedDepartmentProjects)
+                    {
+                        _context.DepartmentProjects.Remove(dp);
+                    }
+
+                    ICollection<Department> actualDepartments = new List<Department>();
+                    foreach (int i in project.Departments)
+                    {
+                        actualDepartments.Add(_context.Departments.Find(i));
+                    }
+
+                    ICollection<DepartmentProject> departmentProjects = new List<DepartmentProject>();
+                    foreach (Department department in actualDepartments)
+                    {
+                        var departmentProject = new DepartmentProject()
+                        {
+                            Department = department,
+                            Project = actualProject,
+                        };
+                        actualProject.Departments.Add(departmentProject);
+                    }
+                }
                 try
                 {
-
                     //return View(project);
-
                     _context.Update(actualProject);
                     await _context.SaveChangesAsync();
                 }
-                catch (System.Data.Entity.Infrastructure.DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException)
                 {
                     if (!ProjectExists(actualProject.Id))
                     {
