@@ -26,19 +26,46 @@
             Owned Projects
         </dt>
         <dd class="col-sm-10">
-            @Model.projects.Count
+            @Model.Ownedprojects.Count
         </dd>
 
 
-        @for (var i = 0; i < Model.projects.Count; i++)
-        {   <dt class="col-sm-2">
-                project @(i+1) 
+        @for (var i = 0; i < Model.Ownedprojects.Count; i++)
+        {
+            <dt class="col-sm-2">
+                Owned project @(i + 1)
             </dt>
             <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.projects[i].Name)
+                @Html.DisplayFor(model => model.Ownedprojects[i].Name)
             </dd>
-           
+
         }
+
+
+        <dt class="col-sm-2">
+            Project participation
+        </dt>
+
+
+        <dd class="col-sm-10">
+            @Model.Participatingprojects.Count
+        </dd>
+
+
+        @for (var i = 0; i < Model.Participatingprojects.Count; i++)
+        {
+            <dt class="col-sm-2">
+                Project participation @(i + 1)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Participatingprojects[i].Project.Name)
+            </dd>
+
+        }
+
+
+
+
     </dl>
 </div>
 <div>
