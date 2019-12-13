@@ -61,12 +61,7 @@ namespace Timesheets.Data
                 new Department() {Id=1, Name="Department 1"},
                 new Department() {Id=2, Name="Department 2"}
                 
-                );
-
-            
-
-
-           
+                );   
         }
     }
 }
