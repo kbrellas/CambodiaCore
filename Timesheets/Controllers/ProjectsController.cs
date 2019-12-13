@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,14 +20,16 @@ namespace Timesheets.Controllers
             _context = context;
         }
         // GET: Projects
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Projects.ToListAsync());
         }
 
-        
-       
+
+
         // GET: Projects/Details/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -70,6 +73,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Projects/Create
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             var departments = new List<SelectListItem>();
@@ -86,6 +90,7 @@ namespace Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Create([Bind("Id,Name,OwnerDept,Departments")] ProjectViewModel project)
         {
             var actualOwnerDept = _context.Departments.Find(project.OwnerDept);
@@ -128,6 +133,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Projects/Edit/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -166,12 +172,34 @@ namespace Timesheets.Controllers
                         
                 }
             }
-            ProjectViewModel projectViewModel = new ProjectViewModel()
+            ProjectViewModel projectViewModel;
+            if (project.OwnerDept != null && project.Departments != null)
             {
-                Name = project.Name,
-                OwnerDept = project.OwnerDept.Id,
-                Departments = departmentsId
-            };
+                projectViewModel = new ProjectViewModel()
+                {
+                    Name = project.Name,
+                    OwnerDept = project.OwnerDept.Id,
+                    Departments = departmentsId
+                };
+            }
+            else if (project.Departments != null) {
+                projectViewModel = new ProjectViewModel()
+                {
+                    Name = project.Name,
+                    
+                    Departments = departmentsId
+                };
+
+            }
+            else 
+            {
+                projectViewModel = new ProjectViewModel()
+                {
+                    Name = project.Name,
+                    OwnerDept = project.OwnerDept.Id
+
+                };
+            }
             
                        
             ViewBag.departments = departments;
@@ -183,6 +211,7 @@ namespace Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,OwnerDept,Departments")] ProjectViewModel project)
         {
 
@@ -261,6 +290,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Projects/Delete/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -288,6 +318,7 @@ namespace Timesheets.Controllers
         // POST: Projects/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var project = await _context.Projects.FindAsync(id);

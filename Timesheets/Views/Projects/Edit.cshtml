@@ -23,7 +23,7 @@
             <div class="form-group">
                 <label asp-for="OwnerDept" class="control-label"></label>
                 <select asp-for="OwnerDept" class="form-control" asp-items=@departments>
-                   
+                    <option value="">Please Add Owner Departments...</option>
                 </select>
                 <span asp-validation-for="OwnerDept" class="text-danger"></span>
             </div>
