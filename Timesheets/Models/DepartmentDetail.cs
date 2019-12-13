@@ -8,6 +8,7 @@ namespace Timesheets.Models
     public class DepartmentDetail
     {
         public Department department {get; set;}
-        public List<Project> projects { get; set; }
+        public List<Project> Ownedprojects { get; set; }
+        public List<DepartmentProject> Participatingprojects { get; set; }
     }
 }
