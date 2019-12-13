@@ -13,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Timesheets.Models;
+using Timesheets.Security;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace Timesheets
 {
@@ -42,7 +45,8 @@ namespace Timesheets
                 })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
+            
+            services.AddScoped<IAuthorizationHandler,  CanGetOnlyOwnedTimesheetsHandler>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

@@ -31,6 +31,26 @@ namespace Timesheets.Data
 
                 }
             }
+            if (userManager.FindByEmailAsync("user1@test.com").Result == null) {
+                MyUser user = new MyUser
+                {
+                    UserName = "user1@test.com",
+                    Email = "user1@test.com",
+                    EmailConfirmed = true,
+                    CostPerHour = 3,
+                    FirstName = "John",
+                    LastName = "Doe"
+                };
+
+                IdentityResult result = userManager.CreateAsync(user, "123456").Result;
+
+                if (result.Succeeded)
+                {
+                    userManager.AddToRoleAsync(user, "Employee").Wait();
+
+                }
+
+            }
         }
     }
 }
