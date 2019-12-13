@@ -1,6 +1,6 @@
-﻿@model Timesheets.Models.Project
+﻿@model Timesheets.Models.ProjectViewModel
 @{
-    var departments = ViewBag.Message;
+    var departments = ViewBag.Departments;
 }
 @{
     ViewData["Title"] = "Edit";
@@ -14,7 +14,7 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+            
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -23,7 +23,7 @@
             <div class="form-group">
                 <label asp-for="OwnerDept" class="control-label"></label>
                 <select asp-for="OwnerDept" class="form-control" asp-items=@departments>
-                    <option value="@ViewBag.InitialDepartmentValue">@ViewBag.InitialDepartmentName</option>
+                   
                 </select>
                 <span asp-validation-for="OwnerDept" class="text-danger"></span>
             </div>

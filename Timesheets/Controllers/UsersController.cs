@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,7 @@ namespace Timesheets.Controllers
             UserManager = userManager;
         }
         // GET: Users
+        [Authorize(Roles = "Admin ")]
         public async Task<ActionResult> Index()
         {
             var users = _context.Users.Include(d=>d.Department).ToList();
@@ -31,6 +33,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Users/Details/5
+        [Authorize(Roles = "Admin ")]
         public async Task<ActionResult> Details(string id)
         {
             if (id == null)
@@ -46,9 +49,10 @@ namespace Timesheets.Controllers
         }
 
         // GET: Users/Create
-       
+
 
         // GET: Users/Edit/5
+        [Authorize(Roles = "Admin ")]
         public async Task<ActionResult> Edit(String id)
         { 
         if (id == null)
@@ -112,6 +116,7 @@ namespace Timesheets.Controllers
         // POST: Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin ")]
         public async Task<ActionResult> Edit(string id, MyUserViewModel userViewModel)
         {
             var actualUser= _context.Users.Include(d => d.Department).FirstOrDefault(i => i.Id == id);
@@ -138,6 +143,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Users/Delete/5
+        [Authorize(Roles = "Admin ")]
         public async Task<ActionResult> Delete(string id)
         {
             if (id == null)
@@ -162,6 +168,7 @@ namespace Timesheets.Controllers
         // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin ")]
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
             try

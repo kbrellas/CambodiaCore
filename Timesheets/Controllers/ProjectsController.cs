@@ -134,15 +134,20 @@ namespace Timesheets.Controllers
             {
                 return NotFound();
             }
-            var project = await _context.Projects.FindAsync(id);
+            var project =  _context.Projects.Include(d=>d.OwnerDept).Include(d=>d.Departments).FirstOrDefault(i=>i.Id==id);
             if (project == null)
             {
                 return NotFound();
             }
             var departments = new List<SelectListItem>();
+            var departmentsId = new List<int>();
             foreach (Department department in (await _context.Departments.ToListAsync()))
             {
                 departments.Add(new SelectListItem() { Value = department.Id.ToString(), Text = department.Name });
+                
+            }
+            foreach(DepartmentProject dept in project.Departments) {
+                departmentsId.Add(dept.DepartmentId);
             }
             if(project.OwnerDept == null)
             {
@@ -161,10 +166,16 @@ namespace Timesheets.Controllers
                         
                 }
             }
+            ProjectViewModel projectViewModel = new ProjectViewModel()
+            {
+                Name = project.Name,
+                OwnerDept = project.OwnerDept.Id,
+                Departments = departmentsId
+            };
             
                        
-            ViewBag.Message = departments;
-            return View(project);
+            ViewBag.departments = departments;
+            return View(projectViewModel);
         }
 
         // POST: Projects/Edit/5

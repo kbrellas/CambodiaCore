@@ -16,6 +16,22 @@
     <Compile Remove="Data\Migrations\20191213113404_initial41.Designer.cs" />
     <Compile Remove="Data\Migrations\20191213113614_initial411.cs" />
     <Compile Remove="Data\Migrations\20191213113614_initial411.Designer.cs" />
+    <Compile Remove="Migrations\20191213170903_INitial23.cs" />
+    <Compile Remove="Migrations\20191213170903_INitial23.Designer.cs" />
+    <Compile Remove="Migrations\20191213173304_INitial23243.cs" />
+    <Compile Remove="Migrations\20191213173304_INitial23243.Designer.cs" />
+    <Compile Remove="Migrations\20191213173354_INitial232433.cs" />
+    <Compile Remove="Migrations\20191213173354_INitial232433.Designer.cs" />
+    <Compile Remove="Migrations\20191213193151_INitial2324336.cs" />
+    <Compile Remove="Migrations\20191213193151_INitial2324336.Designer.cs" />
+    <Compile Remove="Migrations\20191213200334_INitial23243362.cs" />
+    <Compile Remove="Migrations\20191213200334_INitial23243362.Designer.cs" />
+    <Compile Remove="Migrations\20191213200521_INitial2324336222.cs" />
+    <Compile Remove="Migrations\20191213200521_INitial2324336222.Designer.cs" />
+    <Compile Remove="Migrations\20191213200625_INitial23222.cs" />
+    <Compile Remove="Migrations\20191213200625_INitial23222.Designer.cs" />
+    <Compile Remove="Migrations\20191213200710_INitial232222.cs" />
+    <Compile Remove="Migrations\20191213200710_INitial232222.Designer.cs" />
   </ItemGroup>
 
 
