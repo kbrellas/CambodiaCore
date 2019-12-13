@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,10 +13,11 @@ namespace Timesheets.Security
 {
     public class CanGetOnlyOwnedTimesheetsHandler : AuthorizationHandler<OperationAuthorizationRequirement, TimesheetEntry>
     {
-        
-        
 
-        public CanGetOnlyOwnedTimesheetsHandler() {
+        ApplicationDbContext _context;
+
+        public CanGetOnlyOwnedTimesheetsHandler(ApplicationDbContext context) {
+            this._context = context;
             
             
         }
@@ -47,12 +48,14 @@ namespace Timesheets.Security
             }
             
             if (context.User.IsInRole("Manager")) {
-                
-                if (resource.RelatedUser.Department.DepartmentHeadId== context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value) 
+                var actualResource = _context.TimesheetEntries.Include(d => d.RelatedUser).Include(d=>d.RelatedUser.Department).FirstOrDefault(i => i.Id == resource.Id);
+                if (actualResource.RelatedUser.Department.DepartmentHeadId != null)
                 {
-                    context.Succeed(requirement);
+                    if (actualResource.RelatedUser.Department.DepartmentHeadId == context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value)
+                    {
+                        context.Succeed(requirement);
+                    }
                 }
-                
             }
 
             if (context.User.IsInRole("Employee"))
