@@ -28,24 +28,25 @@
             @headDepartment
         </dd>
     </dl>
-</div>
-<div class=" col-sm-12">
-    <table class="col-sm-13">
-        <tr>
-            <th>Contibuting Departments </th>
-        </tr>
-        @{
-            foreach (string s in names)
-            {
-                <tr>
-                            <td>@s</td> 
-                </tr>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Contributing Departments
+        </dt>
+        <dd class="col-sm-10">
+            @{
+                foreach (string s in names)
+                {
+                    <tr>
+                        <td>@s</td>
+                    </tr>
+                    <br>
 
+                }
             }
-        }
-    </table>
-            
- </div>
+        </dd>
+    </dl>
+</div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

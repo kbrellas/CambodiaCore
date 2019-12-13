@@ -26,7 +26,7 @@
                             if (SignInManager.Context.User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="TimesheetEntries" asp-action="Index">Timesheets</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="TimesheetEntries" asp-action="Index">Timesheet Entries</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Departments" asp-action="Index">Departments</a>
@@ -37,6 +37,41 @@
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Stats" asp-action="Index">Statistics</a>
+                                </li>
+                            }
+                            else if (SignInManager.Context.User.IsInRole("Manager") && SignInManager.Context.User.IsInRole("Employee"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="TimesheetEntries" asp-action="Index">Timesheet Entries</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Departments" asp-action="Index">Departments</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Stats" asp-action="Index">Statistics</a>
+                                </li>
+                            }
+                            else if (SignInManager.Context.User.IsInRole("Manager"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="TimesheetEntries" asp-action="Index">Timesheet Entries</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Departments" asp-action="Index">Departments</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Stats" asp-action="Index">Statistics</a>
+                                </li>
+
+                            }
+                            else if (SignInManager.Context.User.IsInRole("Employee")) { 
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="TimesheetEntries" asp-action="Index">Timesheet Entries</a>
+                    </li>
                             }
                         }
 
