@@ -94,6 +94,17 @@ namespace Timesheets.Controllers
 
             if (ModelState.IsValid)
             {
+                var departments = await _context.Departments.ToListAsync();
+                foreach (Department d in departments)
+                {
+                    if (d.Name.Equals(department.Name))
+                    {
+                        ViewBag.message = "Department name already exists";
+                        ViewBag.title = "Error Creating Department";
+                        ViewBag.alertClass = "alert alert-danger";
+                        return View("~/Views/Departments/Alerts.cshtml");
+                    }
+                }
                 _context.Add(department);
                 try
                 {
