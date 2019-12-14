@@ -34,7 +34,7 @@ namespace Timesheets.Controllers
         }
 
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<ActionResult> Index() {
+        public  ActionResult Index() {
             return View();
         }
 

@@ -28,7 +28,8 @@ namespace Timesheets.Controllers
         [Authorize(Roles = "Admin ")]
         public async Task<ActionResult> Index()
         {
-            var users = _context.Users.Include(d=>d.Department).ToList();
+            var users =await _context.Users.Include(d=>d.Department).ToListAsync();
+
             return  View(users);
         }
 
@@ -53,7 +54,7 @@ namespace Timesheets.Controllers
 
         // GET: Users/Edit/5
         [Authorize(Roles = "Admin ")]
-        public async Task<ActionResult> Edit(String id)
+        public  ActionResult Edit(String id)
         { 
         if (id == null)
             {
