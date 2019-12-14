@@ -6,7 +6,7 @@
 <h1>Details</h1>
 
 <div>
-    <h4>TimesheetEntry</h4>
+    <h4>User</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -42,7 +42,7 @@
         <dd class="col-sm-10">
             @if (Model.Manager != null)
             {
-            @Model.Manager.FirstName @Model.Manager.LastName
+            @Model.Manager.FirstName<text> </text> @Model.Manager.LastName
             }
         </dd>
         <dt class="col-sm-2">

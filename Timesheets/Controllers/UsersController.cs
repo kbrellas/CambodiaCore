@@ -124,15 +124,27 @@ namespace Timesheets.Controllers
             await UserManager.RemoveFromRolesAsync(actualUser,allRolelist);
             try
             {
-                actualUser.FirstName = userViewModel.FirstName;
-                actualUser.LastName = userViewModel.LastName;
-                actualUser.Email = userViewModel.Email;
-                actualUser.CostPerHour = userViewModel.CostPerHour;
-                actualUser.Department =await _context.Departments.FindAsync(userViewModel.DepartmentId);
-                actualUser.Manager =await _context.Users.FindAsync(actualUser.Department.DepartmentHeadId);
-                await UserManager.AddToRolesAsync(actualUser, userViewModel.Role);
-                await UserManager.UpdateAsync(actualUser);
-                
+                if (userViewModel.Role.Contains("Manager") || userViewModel.Role.Contains("Admin"))
+                {
+                    actualUser.FirstName = userViewModel.FirstName;
+                    actualUser.LastName = userViewModel.LastName;
+                    actualUser.Email = userViewModel.Email;
+                    actualUser.CostPerHour = userViewModel.CostPerHour;
+                    actualUser.Department = await _context.Departments.FindAsync(userViewModel.DepartmentId);
+                    
+                    await UserManager.AddToRolesAsync(actualUser, userViewModel.Role);
+                    await UserManager.UpdateAsync(actualUser);
+                }
+                else {
+                    actualUser.FirstName = userViewModel.FirstName;
+                    actualUser.LastName = userViewModel.LastName;
+                    actualUser.Email = userViewModel.Email;
+                    actualUser.CostPerHour = userViewModel.CostPerHour;
+                    actualUser.Department = await _context.Departments.FindAsync(userViewModel.DepartmentId);
+                    actualUser.Manager = await _context.Users.FindAsync(actualUser.Department.DepartmentHeadId);
+                    await UserManager.AddToRolesAsync(actualUser, userViewModel.Role);
+                    await UserManager.UpdateAsync(actualUser);
+                }
 
                 return RedirectToAction(nameof(Index));
             }

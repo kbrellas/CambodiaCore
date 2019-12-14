@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Timesheets.Data;
 using Timesheets.Models;
@@ -115,16 +116,34 @@ namespace Timesheets.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                MyUser user;
                 Department selDept = _context.Departments.First(x => x.Id == Input.SelectedDepartment);
-
-                var user = new MyUser { UserName = Input.Email,
-                    Email = Input.Email,
-                    FirstName = Input.FirstName,
-                    LastName = Input.LastName,
-                    Department = selDept,
-                    CostPerHour = Input.CostPerHour,
-                    Manager = _context.Users.FirstOrDefault(u => u.Id == selDept.DepartmentHeadId)
-                };
+                if (Input.SelectedRoles.Contains("Manager") || Input.SelectedRoles.Contains("Admin"))
+                {
+                     user= new MyUser
+                    {
+                        UserName = Input.Email,
+                        Email = Input.Email,
+                        FirstName = Input.FirstName,
+                        LastName = Input.LastName,
+                        Department = selDept,
+                        CostPerHour = Input.CostPerHour,
+                        Manager = null
+                    };
+                }
+                else
+                {
+                     user = new MyUser
+                    {
+                        UserName = Input.Email,
+                        Email = Input.Email,
+                        FirstName = Input.FirstName,
+                        LastName = Input.LastName,
+                        Department = selDept,
+                        CostPerHour = Input.CostPerHour,
+                        Manager = _context.Users.FirstOrDefault(u => u.Id == selDept.DepartmentHeadId)
+                    };
+                }
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
@@ -135,7 +154,20 @@ namespace Timesheets.Areas.Identity.Pages.Account
 
                     if (Input.SelectedRoles.Contains("Manager")) {
                         var managedDepartment = _context.Departments.Find(selDept.Id);
-                        managedDepartment.DepartmentHead = user;
+                        managedDepartment.DepartmentHeadId = user.Id;
+                        var allUsers = _context.Users.Include(d => d.Department).ToList();
+                        foreach (MyUser usr in allUsers)
+                        {
+                            if (usr.Department!=null&&usr.Department.Id == selDept.Id)
+                            {
+                                var role = _userManager.GetRolesAsync(usr).Result;
+                                if ((!role.Contains("Manager")) && (!role.Contains("Admin")))
+                                {
+                                    usr.Manager = user;
+                                }
+                            }
+                        }
+
                         _context.SaveChanges();
                     }
 

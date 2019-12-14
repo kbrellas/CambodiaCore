@@ -166,9 +166,26 @@ namespace Timesheets.Controllers
 
             if (ModelState.IsValid)
             {
+                var actualDept=_context.Departments.Find(id);
                 try
                 {
-                    _context.Update(department);
+                    var allUsers =await _context.Users.Include(d => d.Department).ToListAsync();
+                    foreach (MyUser usr in allUsers)
+                    {
+                        var roles =  _userManager.GetRolesAsync(usr).Result;
+                        if (!roles.Contains("Manager") && !roles.Contains("Admin"))
+                        {
+
+                            if (usr.Department != null && usr.Department.Id == department.Id)
+                            {
+                                var head = _context.Users.Find(department.DepartmentHeadId);
+                                usr.Manager = head;
+                            }
+                        }
+                    }
+                    actualDept.Name = department.Name;
+                    actualDept.DepartmentHeadId = department.DepartmentHeadId;
+                    //_context.Update(department);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
