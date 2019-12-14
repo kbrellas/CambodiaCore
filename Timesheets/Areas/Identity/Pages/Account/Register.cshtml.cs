@@ -133,6 +133,12 @@ namespace Timesheets.Areas.Identity.Pages.Account
 
                     await _userManager.AddToRolesAsync(user, Input.SelectedRoles);
 
+                    if (Input.SelectedRoles.Contains("Manager")) {
+                        var managedDepartment = _context.Departments.Find(selDept.Id);
+                        managedDepartment.DepartmentHead = user;
+                        _context.SaveChanges();
+                    }
+
                     // TODO: This must be implemented correctly - THIS CODE SHOULD NOT EXIST
                     //if (selDept.RelatedUsers == null)
                     //    selDept.RelatedUsers = new List<MyUser>();

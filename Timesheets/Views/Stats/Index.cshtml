@@ -1,0 +1,177 @@
+﻿<html>
+
+<head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {
+            'packages': ['corechart']
+        });
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            drawPieChart();
+            drawBarChart();
+            drawLineChart();
+
+        }
+
+
+
+        function drawPieChart() {
+
+            var JsonData = {};
+            var url = "https://localhost:44333/Stats/time";
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    JsonData = JSON.parse(this.responseText);
+                    console.log(this.JsonData);
+                    //    document.getElementById("demo").innerHTML = myObj.name;
+
+                    var DataArray = [];
+
+
+                    for (var i in JsonData) {
+                        DataArray.push([i, JsonData[i]]);
+
+                        var options = {
+                            'title': 'Time % per Project',
+                            'width': 400,
+                            'height': 300
+                        };
+
+                        var data = new google.visualization.DataTable();
+                        data.addColumn("string", "Project");
+                        data.addColumn('number', 'Cost');
+                        data.addRows(DataArray);
+
+                        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+                        chart.draw(data, options);
+
+                    }
+
+                }
+            };
+
+
+        }
+
+
+        function drawBarChart() {
+
+            var JsonData = {};
+            var url = "https://localhost:44333/Stats/cost";
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    JsonData = JSON.parse(this.responseText);
+                    console.log(this.JsonData);
+
+                    var DataArray = [];
+
+
+                    for (var i in JsonData) {
+                        DataArray.push([i, JsonData[i]]);
+
+                        var options = {
+                            'title': 'Cost per Project',
+                            'width': 400,
+                            'height': 300
+                        };
+
+                        var data = new google.visualization.DataTable();
+                        data.addColumn("string", "Project");
+                        data.addColumn('number', 'Cost');
+                        data.addRows(DataArray);
+
+                        var chart = new google.visualization.BarChart(document.getElementById('Barchart_div'));
+                        chart.draw(data, options);
+
+                    }
+
+                }
+            };
+
+        }
+
+
+        function drawLineChart() {
+
+            var JsonData = {};
+            var url = "https://localhost:44333/Stats/history";
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    JsonData = JSON.parse(this.responseText);
+                    console.log(JsonData);
+                    //    document.getElementById("demo").innerHTML = myObj.name;
+
+                    var DataArray = [
+                        ['Month', 'Time', 'Cost']
+                    ];
+
+
+                    for (var i in JsonData) {
+                        DataArray.push([i, JsonData[i].time, JsonData[i].cost]);
+                        console.log(DataArray);
+                    }
+
+                    var data = google.visualization.arrayToDataTable(DataArray);
+                    // var data = google.visualization.arrayToDataTable([
+                    //     ['Year', 'Sales', 'Expenses'],
+                    //     ['2004', 1000, 400],
+                    //     ['2005', 1170, 460],
+                    //     ['2006', 660, 1120],
+                    //     ['2007', 1030, 540]
+                    // ]);
+
+
+                    var options = {
+                        title: 'Performance',
+                        //  curveType: 'function',
+                        legend: {
+                            position: 'bottom'
+                        }
+                    };
+
+                    // var data = new google.visualization.DataTable();
+                    // data.addColumn("string", "Project");
+                    // data.addColumn('number', 'Cost');
+                    // data.addRows(DataArray);
+
+                    var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+                    chart.draw(data, options);
+
+
+
+
+
+
+
+
+
+
+                }
+            };
+        }
+    </script>
+</head>
+
+<body>
+    <!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>
+    <div id="Barchart_div"></div>
+    <div id="curve_chart"></div>
+</body>
+
+</html>

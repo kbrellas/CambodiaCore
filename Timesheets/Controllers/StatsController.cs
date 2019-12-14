@@ -17,7 +17,7 @@ namespace Timesheets.Controllers
        public double cost { get; set; }
     }
 
-
+    
 
     [Route("Stats")]
     [ApiController]
@@ -30,6 +30,10 @@ namespace Timesheets.Controllers
         {
             this._context = context;
             this._usermanager = userManager;
+        }
+
+        public async Task<ActionResult> Index() {
+            return View();
         }
 
         [HttpGet("time")]
