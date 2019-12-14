@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -32,11 +33,13 @@ namespace Timesheets.Controllers
             this._usermanager = userManager;
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult> Index() {
             return View();
         }
 
         [HttpGet("time")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult> GetProjectsPerTime()
         {
             Dictionary<string, int> data = await ProjectTimeData();
@@ -46,9 +49,8 @@ namespace Timesheets.Controllers
 
         }
 
-
-
         [HttpGet("cost")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult> GetProjectsPerCost()
         {
             Dictionary<string, double> data = await ProjectCostData();
@@ -59,6 +61,7 @@ namespace Timesheets.Controllers
         }
 
         [HttpGet("history")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult> GetProjectsd()
         {
 
@@ -67,15 +70,7 @@ namespace Timesheets.Controllers
             return Json(data);
 
         }
-
-
-
-
-
-
-
-
-
+        [Authorize(Roles = "Admin,Manager")]
         private async Task<Dictionary<string, int>> ProjectTimeData()
         {
             Dictionary<string, int> data = new Dictionary<string, int>();
@@ -96,6 +91,7 @@ namespace Timesheets.Controllers
             return data;
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         private async Task<Dictionary<string, double>> ProjectCostData()
         {
             Dictionary<string, double> data = new Dictionary<string, double>();
@@ -116,8 +112,7 @@ namespace Timesheets.Controllers
             return data;
         }
 
-
-
+        [Authorize(Roles = "Admin,Manager")]
         private async Task<Dictionary<string, HistoryItem>> ProjectHistoryData()
 
         {

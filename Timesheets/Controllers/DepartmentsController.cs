@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -30,6 +31,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Departments
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = await _context.Departments
@@ -49,6 +51,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Departments/Details/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -69,6 +72,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Departments/Create
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Create()
         {
             // ViewData["DepartmentHeadId"] = new SelectList(_context.Users, "Id", "Id");
@@ -89,6 +93,7 @@ namespace Timesheets.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Create([Bind("Id,Name,DepartmentHeadId")] Department department)
         {
 
@@ -128,6 +133,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Departments/Edit/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -157,6 +163,7 @@ namespace Timesheets.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,DepartmentHeadId")] Department department)
         {
             if (id != department.Id)
@@ -223,6 +230,7 @@ namespace Timesheets.Controllers
         }
 
         // GET: Departments/Delete/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -247,6 +255,7 @@ namespace Timesheets.Controllers
         // POST: Departments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             // var department = await _context.Departments.FindAsync(id);
@@ -280,12 +289,13 @@ namespace Timesheets.Controllers
           
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         private bool DepartmentExists(int id)
         {
             return _context.Departments.Any(e => e.Id == id);
         }
 
-
+        [Authorize(Roles = "Admin,Manager")]
         private async Task<DepartmentDetail> GetDepartmentDetailData(Department department)
         {
             var OwnedProjects = await _context.Projects.Where(p => p.OwnerDept == department).ToListAsync();
