@@ -17,6 +17,7 @@ namespace Timesheets.Models
         public int OwnerDept { get; set; }
 
         //[DisplayName("Select the Departments that will contribute to the Project")]
+        [Required(ErrorMessage ="You should assing at least one Contributing Department")]
         public List<int> Departments { get; set; }
     }
 }

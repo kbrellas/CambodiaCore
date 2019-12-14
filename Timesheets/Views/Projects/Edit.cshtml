@@ -30,7 +30,7 @@
             <div class="form-group">
                 <label asp-for="Departments" class="control-label"></label>
                 <select asp-for="Departments" class="form-control" asp-items=@departments>
-                    <option value="">Please Add Contributing Departments...</option>
+                    <option disabled value="">Please Add Contributing Departments...</option>
                 </select>
                 <span asp-validation-for="Departments" class="text-danger"></span>
             </div>

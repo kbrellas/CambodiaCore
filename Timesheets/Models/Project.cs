@@ -12,8 +12,9 @@ namespace Timesheets.Models
         public string Name { get; set; }
         [Display(Name = "Owner Department")]
         public Department OwnerDept { get; set; }
-        [Display(Name="Contributing Departments")]
+        [Display(Name = "Contributing Departments")]
 
+        [Required(ErrorMessage ="You should assign at least one Contributing Department")]
         public ICollection<DepartmentProject> Departments { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace Timesheets.Controllers
         public async Task<IActionResult> Index()
         {
 
-            return View(await _context.Projects.Include(d=>d.OwnerDept).Include(d=>d.Departments).ToListAsync());
+            return View(await _context.Projects.Include(d=>d.OwnerDept).Include("Departments.Department").ToListAsync());
         }
 
 
@@ -262,11 +262,12 @@ namespace Timesheets.Controllers
                         };
                         actualProject.Departments.Add(departmentProject);
                     }
-                    if (actualOwnerDept != null)
-                    {
-                        actualProject.OwnerDept = actualOwnerDept;
-                        // _context.Update(actualProject);
-                    }
+                    
+                }
+                if (actualOwnerDept != null)
+                {
+                    actualProject.OwnerDept = actualOwnerDept;
+                    
                 }
                 try
                 {
