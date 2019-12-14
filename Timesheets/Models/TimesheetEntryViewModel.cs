@@ -16,6 +16,7 @@ namespace Timesheets.Models
         public DateTime DateCreated { get; set; }
 
         [Display(Name ="Hours Worked")]
+        [Range(0, 24)]
         public int HoursWorked { get; set; }
     }
 }
