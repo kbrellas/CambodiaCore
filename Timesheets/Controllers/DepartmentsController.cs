@@ -64,22 +64,6 @@ namespace Timesheets.Controllers
                 return NotFound();
             }
 
-            /*var OwnedProjects = await _context.Projects.Where(p =>p.OwnerDept == department).ToListAsync();
-            var projects = await _context.Projects.Include(p =>p.Departments).ToListAsync();
-            
-            DepartmentDetail departmentDetail = new DepartmentDetail();
-            departmentDetail.department = department;
-            departmentDetail.Ownedprojects = OwnedProjects;
-            List<DepartmentProject> participatingProjects = new List<DepartmentProject>();
-            foreach (Project p in projects) {
-                
-                foreach (DepartmentProject dp in p.Departments) {
-                    if (dp.DepartmentId == id) { participatingProjects.Add(dp); }
-                        
-                            }
-               
-            }
-             departmentDetail.Participatingprojects = participatingProjects;*/
             DepartmentDetail departmentDetail = await GetDepartmentDetailData(department);
             return View(departmentDetail);
         }
@@ -115,7 +99,7 @@ namespace Timesheets.Controllers
                 {
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateException e)
+                catch (DbUpdateException)
                 {
                     ViewBag.message = "Department Head already assigned to a Department";
                     ViewBag.title = "Error Creating Department";
@@ -265,7 +249,7 @@ namespace Timesheets.Controllers
             ViewBag.message = "Department was deleted succsfully";
             ViewBag.back = "index";
             return View("~/Views/Departments/Alerts.cshtml");
-            //  return RedirectToAction(nameof(Index));
+          
         }
 
         private bool DepartmentExists(int id)
