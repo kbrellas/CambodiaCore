@@ -8,6 +8,7 @@ namespace Timesheets.Models
     public class Department
     {
         public int Id {get; set;}
+        
         public string Name { get; set; }
         public string DepartmentHeadId { get; set; }
         public MyUser DepartmentHead { get; set; }
