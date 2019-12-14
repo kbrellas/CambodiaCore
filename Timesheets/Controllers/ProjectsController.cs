@@ -229,18 +229,14 @@ namespace Timesheets.Controllers
                 
 
 
-                if (project.Name == null)
+                if (project.Name != null)
                 {
                     actualProject.Name = project.Name;
                     _context.Update(actualProject);
                 }
 
                 var actualOwnerDept = await _context.Departments.FindAsync(project.OwnerDept);
-                if (actualOwnerDept != null)
-                {
-                    actualProject.OwnerDept = actualOwnerDept;
-                    _context.Update(actualProject);
-                }
+                
 
                 if (project.Departments != null)
                 {
@@ -265,6 +261,11 @@ namespace Timesheets.Controllers
                             Project = actualProject,
                         };
                         actualProject.Departments.Add(departmentProject);
+                    }
+                    if (actualOwnerDept != null)
+                    {
+                        actualProject.OwnerDept = actualOwnerDept;
+                        // _context.Update(actualProject);
                     }
                 }
                 try
