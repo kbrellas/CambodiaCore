@@ -23,7 +23,8 @@ namespace Timesheets.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Projects.ToListAsync());
+
+            return View(await _context.Projects.Include(d=>d.OwnerDept).Include(d=>d.Departments).ToListAsync());
         }
 
 
